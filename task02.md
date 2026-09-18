@@ -135,7 +135,7 @@ tokens: 12,936 in / 1,034 out
 
 Trace 直达链接（含完整决策链路与每步耗时）：见笔记末尾 LangSmith 项目链接；查询 Trace 时还撞见了单次 `list_runs` 上限 100 的 API 限制——正好是 pre02 教程提醒过的那个。
 
-【截图位置：LangSmith Trace 瀑布图，见评论区补充图】
+![LangSmith Trace 瀑布图：LangGraph root（39.70s）下两次 ChatOpenAI glm-5.3-flash 模型调用与两次 internet_search 搜索](task02/img/trace-waterfall.png)
 
 ## 三、踩坑与观察记录
 

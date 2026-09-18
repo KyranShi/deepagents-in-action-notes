@@ -105,6 +105,38 @@ write_todos 生效: False
 
 有个亮眼的细节：模型自己**用中英文各搜了一次**（先查中文介绍、再用英文查特性），然后综合两边结果写出带小结表格的完整报告——多轮搜索策略完全是模型自主决策的，我只写了一次 `invoke()`。最终报告以「LangGraph 是一个基于图结构的低层级智能体编排框架……」收尾，还给出了 LangChain vs LangGraph 的选型经验法则。
 
+### 2.5 调试与追踪：查看一次 LangSmith Trace
+
+按教程「调试与追踪」一节，**不改一行代码**，只加三个环境变量就开启了全链路追踪：
+
+```bash
+LANGSMITH_TRACING=true
+LANGSMITH_API_KEY=<my-langsmith-key>
+LANGSMITH_PROJECT=deepagents-course
+```
+
+重跑研究脚本后，LangSmith 的 `deepagents-course` 项目里立刻出现了本次运行。用 SDK 查询这条 Trace 的构成：
+
+```text
+root run: LangGraph | status: success | 耗时 39.7s
+tokens: 12,936 in / 1,034 out
+总 Run 数: 24，构成如下：
+  [llm]  ChatOpenAI × 2                       ← Framework 层：真正的模型调用
+  [tool] internet_search × 2                  ← 我定义的自定义工具
+  [chain] TodoListMiddleware × 4              ┐
+  [chain] SummarizationMiddleware × 2         │
+  [chain] SubAgentMiddleware × 2              ├ ← Harness 层：中间件栈
+  [chain] FilesystemMiddleware × 4            │
+  [chain] AnthropicPromptCachingMiddleware×2  ┘
+  [chain] LangGraph (root) × 1                ← Runtime 层
+```
+
+这条 Trace 就是第 1 章「三个层次」最直观的实证：**根节点是 LangGraph（Runtime），叶子是 ChatOpenAI 模型调用（Framework），中间包裹的整层中间件栈就是 Harness 的本体**——教程说 Deep Agents「预置了一整套经过验证的工具接口和中间件框架」，在 Trace 里看得一清二楚。另一个印证：`SummarizationMiddleware`、`SubAgentMiddleware`、`FilesystemMiddleware` 即使本次任务没用到子 Agent 和文件写入，它们的包装层也在每次模型调用前后默默工作，这正是「开箱即用」的含义。
+
+Trace 直达链接（含完整决策链路与每步耗时）：见笔记末尾 LangSmith 项目链接；查询 Trace 时还撞见了单次 `list_runs` 上限 100 的 API 限制——正好是 pre02 教程提醒过的那个。
+
+【截图位置：LangSmith Trace 瀑布图，见评论区补充图】
+
 ## 三、踩坑与观察记录
 
 **坑 1：LangChain 消息是对象，不是字典。**
@@ -135,4 +167,5 @@ Task02 用三个由小到大的例子把「Harness」这个抽象概念落了地
 - LangGraph 文档：https://docs.langchain.com/oss/python/langgraph/overview
 - 智谱开放平台 OpenAI 接口文档：https://docs.bigmodel.cn/cn/guide/develop/openai/introduction
 - Tavily API 文档：https://docs.tavily.com/
+- LangSmith 可观测性平台：https://smith.langchain.com/
 - Task01 笔记（环境准备）：https://github.com/KyranShi/deepagents-in-action-notes/blob/main/task01.md

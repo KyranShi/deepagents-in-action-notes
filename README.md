@@ -7,6 +7,7 @@
 | Task01 | 环境准备（AgentSeek 生命周期工作流 + 开发技能安装） | [task01.md](./task01.md) |
 | Task02 | 认知篇：Harness 三层架构 + 第一个 Deep Agent（含可运行脚本） | [task02.md](./task02.md) · [task02/](./task02/) |
 | Task03 | 虚拟文件系统与存储后端（三种 Backend 对比实验） | [task03.md](./task03.md) · [task03/](./task03/) |
+| Task04 | 任务规划与分解（write_todos 全程记录 + 研究报告） | [task04.md](./task04.md) · [task04/](./task04/) |
 
 
 ## 打卡日程（截止均为凌晨 03:00）
@@ -16,7 +17,7 @@
 | Task1 | 环境准备 | 1 | 09-15 | ✅ 已提交 |
 | Task2 | 第1章 Framework/Runtime/Harness + 第2章 快速上手 | 3 | 09-18 | ✅ 已提交 |
 
-| Task4 | 第4章 任务规划与分解 | 3 | 09-24 | ⬜ |
+| Task4 | 第4章 任务规划与分解 | 3 | 09-24 | ✅ 已提交 |
 | Task5 | 第5章 子 Agent 与上下文隔离 | 2 | 09-26 | ⬜ |
 | Task6 | 第6章 异步子 Agent + 第7章 Skills | 4 | 09-30 | ⬜ |
 | Task7 | 第8章 长期记忆 + 第9章 Human-in-the-Loop | 4 | 10-04 | ⬜ |

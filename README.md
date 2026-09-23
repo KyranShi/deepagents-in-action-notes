@@ -9,5 +9,6 @@
 | Task03 | 虚拟文件系统与存储后端（三种 Backend 对比实验） | [task03.md](./task03.md) · [task03/](./task03/) |
 | Task04 | 任务规划与分解（write_todos 全程记录 + 研究报告） | [task04.md](./task04.md) · [task04/](./task04/) |
 | Task05 | 子 Agent 与上下文隔离（双角色协作 + 85% 上下文瘦身取证） | [task05.md](./task05.md) · [task05/](./task05/) |
+| Task06 | 异步子 Agent 全生命周期 + Skills 渐进式加载 | [task06.md](./task06.md) · [task06/](./task06/) |
 
 > 笔记中的运行记录均在本地实测：macOS · AgentSeek v0.1.4 · DeepAgents 0.7.13 · GLM (OpenAI 兼容) + Tavily

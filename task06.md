@@ -68,6 +68,31 @@ Skill = 一个含 `SKILL.md`（YAML frontmatter + Markdown 剧本）的目录，
 
 三级加载（L1 元数据启动注入 → L2 正文 → L3 资源）与 description 路由的排他性全部得到验证。
 
+### 补充实验（第 6 章）：并行启动与取消恢复（`async_demo/cancel_parallel_demo.py`）
+
+对照评审要求补做的两个场景，SDK 驱动同一 thread 三轮对话：
+
+**并行启动**：一条用户消息要求同时调研两个主题，Supervisor 在**同一轮内连续调用两次 `start_async_task`**，返回两个独立 task_id，两任务后台并行：
+
+```text
+[工具] start_async_task -> 任务A：Context Engineering 关键手法  → id …25f2
+[工具] start_async_task -> 任务B：Multi-Agent 编排模式          → id …0fd
+[回复] 两个后台调研任务已成功启动 … 两个任务正在后台并行运行
+```
+
+**取消恢复**：要求取消 B 并列出全部任务，`cancel_async_task` + `list_async_tasks` 返回表格化总览；随后确认 A 不受影响：
+
+```text
+[工具] cancel_async_task -> {task_id: …0fd（B）}
+[工具] list_async_tasks
+[回复] 任务A 🟢 running（仍在运行中） | 任务B ⚪ cancelled
+（等待 32s 后第 3 轮）[工具] check_async_task -> 任务A ✅ success
+```
+
+至此评审要求的关键词全部有真实运行记录覆盖：**并行任务、追加指令（update）、取消恢复（cancel + list）、自定义 SKILL.md**。
+
+> 复盘：`list_async_tasks` 的价值在并 plurality 场景才真正显现——单任务时 check 就够，两个以上任务时它是唯一的全局视图，且已结束任务从缓存返回、未结束的并发拉取实时状态，正好对上教程"任务元数据独立 channel"的设计。
+
 ## 三、踩坑与问题复盘
 
 **坑 1：GLM flash 的推理延迟会「吃掉」短 sleep 的异步证据。**
@@ -79,7 +104,10 @@ Skill = 一个含 `SKILL.md`（YAML frontmatter + Markdown 剧本）的目录，
 **坑 3：`langgraph dev` 下不能传 `checkpointer`。**
 教程在第 5 步明确预警：平台已内置持久化，`create_deep_agent(checkpointer=InMemorySaver())` 会直接 `ValueError`。本地 `python supervisor.py` 快速调试时才需要手动挂——同一个参数在两种运行方式下语义相反，容易被上一章的肌肉记忆坑到。
 
-**坑 4：Skills 的 `skills=` 路径是"父目录"而不是 SKILL.md 文件。**
+**坑 4（补充实验）：macOS 系统代理会被 Python 静默继承。**
+补充实验中途 GLM 突发 OpenAIConnectionError，shell `env` 里却没有任何 proxy 变量——是**系统级代理**被 requests/urllib 自动读取，而代理本身处于半可用状态（curl 直连一切正常）。`export no_proxy='*' NO_PROXY='*'` 重启 server 与客户端后恢复。教训：直连可用时，Python 进程要显式 `no_proxy='*'` 才能不被系统代理劫持。
+
+**坑 5：Skills 的 `skills=` 路径是"父目录"而不是 SKILL.md 文件。**
 `skills=["/skills/"]` 对应 `/skills/notes-style/SKILL.md`；传成 `skills=["/skills/notes-style/SKILL.md"]` 不会报错但扫描不到任何技能（目录约定是静默匹配）。排障时先确认路径层级，再怀疑 frontmatter。
 
 ## 四、学习心得
